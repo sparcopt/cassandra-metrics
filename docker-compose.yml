@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  cassandra:
+    image: cassandra
+    container_name: cassandra
+    build:
+      context: .
+    ports:
+      - 7000:7000
+      - 7001:7001
+      - 7070:7070  
+      - 7199:7199
+      - 9042:9042
+      - 9160:9160  
+    networks:
+      - metrics-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    ports:
+      - 9090:9090
+    networks:
+      - metrics-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/dashboards/:/var/lib/grafana/dashboards/  
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    networks:
+      - metrics-network
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  metrics-network:
